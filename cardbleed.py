@@ -30,8 +30,8 @@ def mirror_across_edge(im, edge):
 
     Args:
         im (PIL.Image): Image to mirror.
-        edge (str): Edge across which to mirror. Can be "top", "bottom",
-            "left", or "right" (case insensitive).
+        edge (str): Edge across which to mirror. Can be "top",
+            "bottom", "left", or "right" (case insensitive).
 
     Returns:
         PIL.Image
@@ -60,8 +60,8 @@ def frill(im):
     """
     Create frill image of card image
 
-    A "frill" image is created by mirroring and translating a given image
-    around the perimiter of the image.
+    A "frill" image is created by mirroring and translating a given
+    image around the perimiter of the image.
 
     Args:
         im (PIL.Image): From which to create frill.
@@ -69,9 +69,10 @@ def frill(im):
     Returns:
         PIL.Image
     """
-    # This function ends up creating an image that is a set of 3x3 transposes
-    # of the original. I will start by creating the middle set of three
-    # images, then mirror across the top and bottom of that image.
+    # This function ends up creating an image that is a set of 3x3
+    # transposes of the original. I will start by creating the middle
+    # set of three images, then mirror across the top and bottom of
+    # that image.
     
     base_w, base_h = im.size
 
