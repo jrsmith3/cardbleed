@@ -147,3 +147,89 @@ def add_bleed(im, width=None, height=None):
     res_im = frill_im.crop(box=box)
 
     return res_im
+
+
+def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None, crop_strategy="smaller"):
+    """
+    Add bleed border using frill given image linear spatial dimensions
+
+    This function adds a bleed around an image specified in a linear
+    spatial unit (e.g. inch, mm, etc.). The actual unit does not
+    matter since this function translates them into pixels. The caller
+    must specify the width and height of the image as well as the
+    width and height of the full bleed.
+
+    Args:
+        im (PIL.Image): Image to which bleed will be added.
+        width (float): Width of image in a linear spatial unit.
+        height (float): Height of image in a linear spatial unit.
+        bleed_width (float): Width of full bleed in linear spatial
+            unit. Must be between 1 and 3 times the specified `width`.
+            If `None`, resulting image will be the same width as `im`.
+        bleed_height (float): height of full bleed in linear spatial
+            unit. Must be between 1 and 3 times the specified
+            `height`. If `None`, resulting image will be the same
+            height as `im`.
+        crop_strategy (str): Either "smaller" or "larger"
+            (case-insensitive). If "smaller", some of the image may be
+            cropped out of the resulting image. If "larger", some of
+            the frill may be cropped in.
+
+    Returns:
+        PIL.Image
+
+    Raises:
+        ValueError: If the bleed_width and bleed_height values aren't
+            within the proper range.
+    """
+    base_w, base_h = im.size
+
+    if bleed_width is None:
+        bleed_w = width
+    else:
+        bleed_w = bleed_width
+
+    if bleed_height is None:
+        bleed_h = height
+    else:
+        bleed_h = bleed_height
+
+    def check_out_of_bounds(val, target, val_name, target_name):
+        err_dict = {"val": val, "target": target, "val_name": val_name, "target_name": target_name}
+
+        if val < target:
+            err_msg = "{val_name} ({val}) must be greater than image {target_name} ({target})"
+            raise ValueError(err_msg.format(**err_dict))
+    
+        elif val > 3 * target:
+            err_msg = "{val_name} ({val}) must be less than 3 times image {target_name} ({target})"
+            raise ValueError(err_msg.format(**err_dict))
+
+    check_out_of_bounds(bleed_w, width, "bleed_width", "width")
+    check_out_of_bounds(bleed_h, height, "bleed_height", "height")
+
+    cs = crop_strategy.lower()
+    if cs not in {"larger", "smaller"}:
+        raise ValueError("crop_strategy must either be 'larger' or 'smaller'")
+
+    ppi_w = base_w / width
+    ppi_h = base_h / height
+
+    if ppi_w > ppi_h:
+        ppi_larger = ppi_w
+        ppi_smaller = ppi_h
+    else:
+        ppi_larger = ppi_h
+        ppi_smaller = ppi_w
+
+    if cs == "smaller":
+        ppi = ppi_smaller
+    else:
+        ppi = ppi_larger
+
+    bleed_width_pixels = int(bleed_width * ppi)
+    bleed_height_pixels = int(bleed_height * ppi)
+
+    res_im = add_bleed(im, width=bleed_width_pixels, height=bleed_height_pixels)
+
+    return res_im
