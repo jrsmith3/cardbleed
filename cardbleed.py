@@ -84,3 +84,66 @@ def frill(im):
     res_im = res_im.crop((0, 0, 3 * base_w, 3 * base_h))
 
     return res_im
+
+
+def add_bleed(im, width=None, height=None):
+    """
+    Add bleed border around image using a frill
+
+    Args:
+        im (PIL.Image): Image to which bleed will be added.
+        width (int): Width, in pixels, of the resulting image. Must be
+            between one and three times the value of the pixel-width
+            of `im`. If `None`, the resulting image will be the same
+            width as the `im`.
+        height (int): Height, in pixels, of the resulting image. Must
+            be between one and three times the value of the
+            pixel-height of `im`. If `None`, the resulting image will
+            be the same height as `im`.
+
+    Returns:
+        PIL.Image
+
+    Raises:
+        ValueError: If the width and height values aren't within the
+            proper range.
+    """
+    base_w, base_h = im.size
+
+    if width is None:
+        w = base_w
+    else:
+        w = int(width)
+
+    if height is None:
+        h = base_h
+    else:
+        h = int(height)
+
+    def check_out_of_bounds(val, target, name):
+        err_dict = {"val": val, "target": target, "name": name}
+
+        if val < target:
+            err_msg = "{name} ({val}) must be greater than image pixel-{name} ({target})"
+            raise ValueError(err_msg.format(**err_dict))
+    
+        elif val > 3 * target:
+            err_msg = "{name} ({val}) must be less than and 3 times image pixel-{name} ({target})"
+            raise ValueError(err_msg.format(**err_dict))
+
+    check_out_of_bounds(width, base_w, "width")
+    check_out_of_bounds(height, base_h, "height")
+
+    frill_im = frill(im)
+
+    border_w = int((w - base_w)/2)
+    border_h = int((h - base_h)/2)
+
+    box = (base_w - border_w,
+        base_h - border_h,
+        2 * base_w + border_w,
+        2 * base_h + border_h)
+
+    res_im = frill_im.crop(box=box)
+
+    return res_im
