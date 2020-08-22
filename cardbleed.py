@@ -288,6 +288,11 @@ def create_parser():
         action="store_true",
         help="Suppress all output.")
 
+    parser.add_argument("--dpi",
+        default=300,
+        type=int,
+        help="DPI value of resulting images.")
+
     parser.add_argument("input_file",
         type=argparse.FileType("rb"),
         help="Location of file containing card image(s).")
@@ -350,7 +355,7 @@ if __name__ == "__main__":
         imgs = [img,]
     except UnidentifiedImageError:
         args.input_file.seek(0)
-        imgs = convert_from_bytes(args.input_file.read())
+        imgs = convert_from_bytes(args.input_file.read(), dpi=args.dpi)
 
     pad_width = int(math.log10(len(imgs))) + 1
 
