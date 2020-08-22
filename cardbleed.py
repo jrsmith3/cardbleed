@@ -1,5 +1,18 @@
 # -*- coding: UTF-8 -*-
-from PIL import Image
+import argparse
+import itertools
+import logging
+import math
+import os
+import pathlib
+
+from pdf2image import convert_from_bytes
+from PIL import Image, UnidentifiedImageError
+
+HANDLER = logging.StreamHandler()
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
+LOGGER.addHandler(HANDLER)
 
 
 def _mirror_right(im):
@@ -150,7 +163,7 @@ def add_bleed(im, width=None, height=None):
     return res_im
 
 
-def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None, crop_strategy="smaller"):
+def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None, crop_strategy="smaller", **_):
     """
     Add bleed border using frill given image linear spatial dimensions
 
@@ -175,6 +188,8 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
             (case-insensitive). If "smaller", some of the image may be
             cropped out of the resulting image. If "larger", some of
             the frill may be cropped in.
+        **_ (dict): Ignore everything else that's passed to the
+            function.
 
     Returns:
         PIL.Image
@@ -234,3 +249,119 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
     res_im = add_bleed(im, width=bleed_width_pixels, height=bleed_height_pixels)
 
     return res_im
+
+
+def create_parser():
+    """
+    Factory to create ArgumentParser object defining interface
+
+    Returns:
+        argparse.ArgumentParser
+    """
+    parser = argparse.ArgumentParser("cardbleed", description="Create card images with bleed from PDF.")
+
+    parser.add_argument("--width",
+        type=float,
+        required=True,
+        help="Width of original card.")
+
+    parser.add_argument("--height",
+        type=float,
+        required=True,
+        help="Height of original card.")
+
+    parser.add_argument("--bleed_width",
+        type=float,
+        required=True,
+        help="Width of card including the added bleed.")
+
+    parser.add_argument("--bleed_height",
+        type=float,
+        required=True,
+        help="Height of card including the added bleed.")
+
+    parser.add_argument("--crop_strategy",
+        default="smaller",
+        choices={"smaller", "larger"})
+
+    parser.add_argument("-q", "--quiet",
+        action="store_true",
+        help="Suppress all output.")
+
+    parser.add_argument("--dpi",
+        default=300,
+        type=int,
+        help="DPI value of resulting images.")
+
+    parser.add_argument("input_file",
+        type=argparse.FileType("rb"),
+        help="Location of file containing card image(s).")
+
+    parser.add_argument("output_directory",
+        type=lambda p: pathlib.Path(p).absolute(),
+        help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.")
+
+    return parser
+
+
+def output_filenames(parent_dir=".", suffix="", pad_width=0):
+    """
+    Infinite generator of output filenames
+
+    Filenames are of the form
+
+        <FILE_NUMBER>_card<CARD_NUMBER>_<SIDE>
+
+    FILE_NUMBER increments from 0 for each iteration of this function.
+    The purpose of this filename component is to order the filenames
+    according to their appearance in the input PDF file. CARD_NUMBER
+    and SIDE should be self-explanatory. The FILE_NUMBER can be
+    left-padded with zeros in order to produce an asciibetical
+    sequence of filenames.
+
+    Args:
+        parent_dir (str): Prepended to the filename. Can also be a
+            pathlib.Path type.
+        suffix (str): File extension appended to the filename. The
+            string can include a preceding dot or not.
+        pad_width (int): Determines the number of zeros padding the
+            left of the file number.
+
+    Yields:
+        pathlib.Path: Output filename.
+    """
+    sides = itertools.cycle(("front", "back"))
+    slug = "{:0{pad_width}d}_card{card_no}_{side}"
+
+    for file_no, side in zip(itertools.count(), sides):
+        card_no = int(file_no/2)
+        filename = slug.format(file_no, card_no=card_no, pad_width=pad_width, side=side)
+
+        ext = "." + suffix.lstrip(".")
+        path = pathlib.Path(parent_dir, filename).with_suffix(ext)
+        yield path
+
+
+if __name__ == "__main__":
+    parser = create_parser()
+    args = parser.parse_args()
+
+    logger = logging.getLogger("main")
+    if args.quiet:
+        logger.propagate = False
+
+    try:
+        img = Image.open(args.input_file)
+        imgs = [img,]
+    except UnidentifiedImageError:
+        args.input_file.seek(0)
+        imgs = convert_from_bytes(args.input_file.read(), dpi=args.dpi)
+
+    pad_width = int(math.log10(len(imgs))) + 1
+
+    filenames = output_filenames(parent_dir=args.output_directory, suffix=".png", pad_width=pad_width)
+
+    for im, output_file in zip(imgs, filenames):
+        logger.info(output_file)
+        result = add_dimensioned_bleed(im, **vars(args))
+        result.save(output_file)
