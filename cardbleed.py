@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 import argparse
+import os
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 
 def _mirror_right(im):
@@ -152,7 +153,7 @@ def add_bleed(im, width=None, height=None):
     return res_im
 
 
-def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None, crop_strategy="smaller"):
+def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None, crop_strategy="smaller", **_):
     """
     Add bleed border using frill given image linear spatial dimensions
 
@@ -177,6 +178,8 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
             (case-insensitive). If "smaller", some of the image may be
             cropped out of the resulting image. If "larger", some of
             the frill may be cropped in.
+        **_ (dict): Ignore everything else that's passed to the
+            function.
 
     Returns:
         PIL.Image
@@ -252,7 +255,7 @@ def create_parser():
     parser.add_argument("--bleed_width", type=float, required=True, help="Width of card including the added bleed.")
     parser.add_argument("--bleed_height", type=float, required=True, help="Height of card including the added bleed.")
     parser.add_argument("--crop_strategy", default="smaller", choices={"smaller", "larger"})
-    parser.add_argument("input_file", type=argparse.FileType("r"), help="Location of file containing card image(s).")
+    parser.add_argument("input_file", type=argparse.FileType("rb"), help="Location of file containing card image(s).")
     parser.add_argument("output_directory", default=".", help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.")
 
     return parser
@@ -261,3 +264,14 @@ def create_parser():
 if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
+
+    try:
+        im = Image.open(args.input_file)
+    except UnidentifiedImageError:
+        pass
+
+    result = add_dimensioned_bleed(im, **vars(args))
+
+    output_file = os.path.join(args.output_directory, "foo.png")
+
+    result.save(output_file)
