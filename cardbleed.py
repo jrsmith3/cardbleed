@@ -288,20 +288,42 @@ def create_parser():
     return parser
 
 
-def output_filenames(pad_width=0):
+def output_filenames(parent_dir=".", suffix="", pad_width=0):
     """
     Infinite generator of output filenames
 
+    Filenames are of the form
+
+        <FILE_NUMBER>_card<CARD_NUMBER>_<SIDE>
+
+    FILE_NUMBER increments from 0 for each iteration of this function.
+    The purpose of this filename component is to order the filenames
+    according to their appearance in the input PDF file. CARD_NUMBER
+    and SIDE should be self-explanatory. The FILE_NUMBER can be
+    left-padded with zeros in order to produce an asciibetical
+    sequence of filenames.
+
+    Args:
+        parent_dir (str): Prepended to the filename. Can also be a
+            pathlib.Path type.
+        suffix (str): File extension appended to the filename. The
+            string can include a preceding dot or not.
+        pad_width (int): Determines the number of zeros padding the
+            left of the file number.
+
     Yields:
-        str: Output filename.
+        pathlib.Path: Output filename.
     """
     sides = itertools.cycle(("front", "back"))
     slug = "{:0{pad_width}d}_card{card_no}_{side}"
 
-    for iteration, side in zip(itertools.count(), sides):
-        card_no = int(iteration/2)
-        filename = slug.format(iteration, card_no=card_no, pad_width=pad_width, side=side)
-        yield filename
+    for file_no, side in zip(itertools.count(), sides):
+        card_no = int(file_no/2)
+        filename = slug.format(file_no, card_no=card_no, pad_width=pad_width, side=side)
+
+        ext = "." + suffix.lstrip(".")
+        path = pathlib.Path(parent_dir, filename).with_suffix(ext)
+        yield path
 
 
 if __name__ == "__main__":
