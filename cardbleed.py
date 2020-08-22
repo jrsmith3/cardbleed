@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+import argparse
+
 from PIL import Image
 
 
@@ -236,5 +238,26 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
     return res_im
 
 
+def create_parser():
+    """
+    Factory to create ArgumentParser object defining interface
+
+    Returns:
+        argparse.ArgumentParser
+    """
+    parser = argparse.ArgumentParser("cardbleed", description="Create card images with bleed from PDF.")
+
+    parser.add_argument("--width", type=float, required=True, help="Width of original card.")
+    parser.add_argument("--height", type=float, required=True, help="Height of original card.")
+    parser.add_argument("--bleed_width", type=float, required=True, help="Width of card including the added bleed.")
+    parser.add_argument("--bleed_height", type=float, required=True, help="Height of card including the added bleed.")
+    parser.add_argument("--crop_strategy", default="smaller", choices={"smaller", "larger"})
+    parser.add_argument("input_file", type=argparse.FileType("r"), help="Location of file containing card image(s).")
+    parser.add_argument("output_directory", default=".", help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.")
+
+    return parser
+
+
 if __name__ == "__main__":
-    pass
+    parser = create_parser()
+    args = parser.parse_args()
