@@ -1,12 +1,18 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import itertools
+import logging
 import math
 import os
 import pathlib
 
 from pdf2image import convert_from_bytes
 from PIL import Image, UnidentifiedImageError
+
+HANDLER = logging.StreamHandler()
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
+LOGGER.addHandler(HANDLER)
 
 
 def _mirror_right(im):
@@ -335,6 +341,10 @@ if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
 
+    logger = logging.getLogger("main")
+    if args.quiet:
+        logger.propagate = False
+
     try:
         img = Image.open(args.input_file)
         imgs = [img,]
@@ -347,5 +357,6 @@ if __name__ == "__main__":
     filenames = output_filenames(parent_dir=args.output_directory, suffix=".png", pad_width=pad_width)
 
     for im, output_file in zip(imgs, filenames):
+        logger.info(output_file)
         result = add_dimensioned_bleed(im, **vars(args))
         result.save(output_file)
