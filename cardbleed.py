@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import argparse
+import itertools
 import os
 
 from pdf2image import convert_from_bytes
@@ -260,6 +261,22 @@ def create_parser():
     parser.add_argument("output_directory", default=".", help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.")
 
     return parser
+
+
+def output_filenames(pad_width=0):
+    """
+    Infinite generator of output filenames
+
+    Yields:
+        str: Output filename.
+    """
+    sides = itertools.cycle(("front", "back"))
+    slug = "{:0{pad_width}d}_card{card_no}_{side}"
+
+    for iteration, side in zip(itertools.count(), sides):
+        card_no = int(iteration/2)
+        filename = slug.format(iteration, card_no=card_no, pad_width=pad_width, side=side)
+        yield filename
 
 
 if __name__ == "__main__":
