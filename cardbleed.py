@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import itertools
+import math
 import os
 import pathlib
 
@@ -337,8 +338,10 @@ if __name__ == "__main__":
         args.input_file.seek(0)
         imgs = convert_from_bytes(args.input_file.read())
 
-    for im in imgs:
-        output_file = os.path.join(args.output_directory, "foo.png")
+    pad_width = int(math.log10(len(imgs))) + 1
 
+    filenames = output_filenames(parent_dir=args.output_directory, suffix=".png", pad_width=pad_width)
+
+    for im, output_file in zip(imgs, filenames):
         result = add_dimensioned_bleed(im, **vars(args))
         result.save(output_file)
