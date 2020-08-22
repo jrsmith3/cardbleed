@@ -258,7 +258,7 @@ def create_parser():
     parser.add_argument("--bleed_height", type=float, required=True, help="Height of card including the added bleed.")
     parser.add_argument("--crop_strategy", default="smaller", choices={"smaller", "larger"})
     parser.add_argument("input_file", type=argparse.FileType("rb"), help="Location of file containing card image(s).")
-    parser.add_argument("output_directory", default=".", help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.")
+    parser.add_argument("output_directory", help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.")
 
     return parser
 
