@@ -288,6 +288,11 @@ def create_parser():
         action="store_true",
         help="Suppress all output.")
 
+    parser.add_argument("--dpi",
+        default=300,
+        type=int,
+        help="DPI value of resulting images.")
+
     parser.add_argument("input_file",
         type=argparse.FileType("rb"),
         help="Location of file containing card image(s).")
