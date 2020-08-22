@@ -355,7 +355,7 @@ if __name__ == "__main__":
         imgs = [img,]
     except UnidentifiedImageError:
         args.input_file.seek(0)
-        imgs = convert_from_bytes(args.input_file.read())
+        imgs = convert_from_bytes(args.input_file.read(), dpi=args.dpi)
 
     pad_width = int(math.log10(len(imgs))) + 1
 
