@@ -278,6 +278,10 @@ def create_parser():
         default="smaller",
         choices={"smaller", "larger"})
 
+    parser.add_argument("-q", "--quiet",
+        action="store_true",
+        help="Suppress all output.")
+
     parser.add_argument("input_file",
         type=argparse.FileType("rb"),
         help="Location of file containing card image(s).")
