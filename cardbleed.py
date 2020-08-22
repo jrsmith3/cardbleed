@@ -2,6 +2,7 @@
 import argparse
 import os
 
+from pdf2image import convert_from_bytes
 from PIL import Image, UnidentifiedImageError
 
 
@@ -266,12 +267,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        im = Image.open(args.input_file)
+        img = Image.open(args.input_file)
+        imgs = [img,]
     except UnidentifiedImageError:
-        pass
+        args.input_file.seek(0)
+        imgs = convert_from_bytes(args.input_file.read())
 
-    result = add_dimensioned_bleed(im, **vars(args))
+    for im in imgs:
+        output_file = os.path.join(args.output_directory, "foo.png")
 
-    output_file = os.path.join(args.output_directory, "foo.png")
-
-    result.save(output_file)
+        result = add_dimensioned_bleed(im, **vars(args))
+        result.save(output_file)
