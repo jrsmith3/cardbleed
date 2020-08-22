@@ -234,3 +234,7 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
     res_im = add_bleed(im, width=bleed_width_pixels, height=bleed_height_pixels)
 
     return res_im
+
+
+if __name__ == "__main__":
+    pass
