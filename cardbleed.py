@@ -412,5 +412,6 @@ if __name__ == "__main__":
 
     for im, output_file in zip(imgs, filenames):
         logger.info(output_file)
-        result = add_dimensioned_bleed(im, **vars(args))
+        stripped = strip_pixels(im, *args.strip)
+        result = add_dimensioned_bleed(stripped, **vars(args))
         result.save(output_file)
