@@ -251,6 +251,49 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
     return res_im
 
 
+def strip_pixels(im, *args):
+    """
+    Remove line of pixels from specified edge of image
+
+    Args:
+        im (PIL.Image): Image from which to strip pixels.
+        args (str): Edge from which to remove pixels. Can be "top",
+            "bottom", "left", or "right" (case insensitive).
+
+    Returns:
+        PIL.Image
+    """
+    edjs = {e.lower() for e in args}
+    legal_values = {"top", "bottom", "left", "right"}
+
+    if not edjs <= legal_values:
+        raise ValueError("Edge must be 'top', 'bottom', 'left', or 'right'.")
+
+    base_w, base_h = im.size
+
+    left = 0
+    upper = 0
+    right = base_w
+    lower = base_h
+
+    if "left" in edjs:
+        left += 1
+
+    if "upper" in edjs:
+        upper += 1
+
+    if "right"  in edjs:
+        right -= 1
+
+    if "bottom" in edjs:
+        lower -= 1
+
+    box = (left, upper, right, lower)
+    result = im.crop(box)
+
+    return result
+
+
 def create_parser():
     """
     Factory to create ArgumentParser object defining interface
