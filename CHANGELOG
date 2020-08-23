@@ -1,2 +1,3 @@
 [0.0.2]
 * 10: Add CHANGELOG
+* 11: Add pixel strip argument and functionality to cli
