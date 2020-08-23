@@ -293,6 +293,12 @@ def create_parser():
         type=int,
         help="DPI value of resulting images.")
 
+    parser.add_argument("--strip",
+        action="append",
+        default=[],
+        choices={"top", "bottom", "left", "right"},
+        help="Remove single strip of pixels from specified side of image before adding the bleed.")
+
     parser.add_argument("input_file",
         type=argparse.FileType("rb"),
         help="Location of file containing card image(s).")
