@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-* Reformat CHANGELOG (#17)
 * Configure project to use hatch (#15)
+
+
+### Changed
+* Make edits suggested by `ruff` linter (#19)
+* Reformat CHANGELOG (#17)
 
 
 ## [0.0.2]
