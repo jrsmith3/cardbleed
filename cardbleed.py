@@ -51,10 +51,10 @@ def mirror_across_edge(im, edge):
     edj = edge.lower()
 
     transforms = {
-            "top": [Image.ROTATE_270, Image.ROTATE_90],
-            "bottom": [Image.ROTATE_90, Image.ROTATE_270],
-            "left": [Image.ROTATE_180, Image.ROTATE_180]
-        }
+        "top": [Image.ROTATE_270, Image.ROTATE_90],
+        "bottom": [Image.ROTATE_90, Image.ROTATE_270],
+        "left": [Image.ROTATE_180, Image.ROTATE_180],
+    }
 
     if edj in transforms:
         rot_im = im.transpose(transforms[edj][0])
@@ -63,7 +63,7 @@ def mirror_across_edge(im, edge):
     elif edj == "right":
         result_im = _mirror_right(im)
     else:
-        raise ValueError("Invalid value for 'edge'.")
+        raise ValueError("Invalid value for 'edge'.")  # noqa: TRY003, EM101
 
     return result_im
 
@@ -96,7 +96,7 @@ def frill(im):
     res_im = mirror_across_edge(res_im, edge="bottom")
     res_im = res_im.crop((0, 0, 3 * base_w, 3 * base_h))
 
-    return res_im
+    return res_im  # noqa: RET504
 
 
 def add_bleed(im, width=None, height=None):
@@ -142,17 +142,14 @@ def add_bleed(im, width=None, height=None):
 
     frill_im = frill(im)
 
-    border_w = int((w - base_w)/2)
-    border_h = int((h - base_h)/2)
+    border_w = int((w - base_w) / 2)
+    border_h = int((h - base_h) / 2)
 
-    box = (base_w - border_w,
-        base_h - border_h,
-        2 * base_w + border_w,
-        2 * base_h + border_h)
+    box = (base_w - border_w, base_h - border_h, 2 * base_w + border_w, 2 * base_h + border_h)
 
     res_im = frill_im.crop(box=box)
 
-    return res_im
+    return res_im  # noqa: RET504
 
 
 def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None, crop_strategy="smaller", **_):
@@ -211,7 +208,7 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
 
     cs = crop_strategy.lower()
     if cs not in {"larger", "smaller"}:
-        raise ValueError("crop_strategy must either be 'larger' or 'smaller'")
+        raise ValueError("crop_strategy must either be 'larger' or 'smaller'")  # noqa TRY003, EM101
 
     ppi_w = base_w / width
     ppi_h = base_h / height
@@ -230,7 +227,7 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
 
     res_im = add_bleed(im, width=bleed_width_pixels, height=bleed_height_pixels)
 
-    return res_im
+    return res_im  # noqa: RET504
 
 
 def strip_pixels(im, *args):
@@ -249,7 +246,7 @@ def strip_pixels(im, *args):
     legal_values = {"top", "bottom", "left", "right"}
 
     if not edjs <= legal_values:
-        raise ValueError("Edge must be 'top', 'bottom', 'left', or 'right'.")
+        raise ValueError("Edge must be 'top', 'bottom', 'left', or 'right'.")  # noqa TRY003, EM101
 
     base_w, base_h = im.size
 
@@ -264,7 +261,7 @@ def strip_pixels(im, *args):
     if "upper" in edjs:
         upper += 1
 
-    if "right"  in edjs:
+    if "right" in edjs:
         right -= 1
 
     if "bottom" in edjs:
@@ -273,7 +270,7 @@ def strip_pixels(im, *args):
     box = (left, upper, right, lower)
     result = im.crop(box)
 
-    return result
+    return result  # noqa: RET504
 
 
 def create_parser():
@@ -285,52 +282,35 @@ def create_parser():
     """
     parser = argparse.ArgumentParser("cardbleed", description="Create card images with bleed from PDF.")
 
-    parser.add_argument("--width",
-        type=float,
-        required=True,
-        help="Width of original card.")
+    parser.add_argument("--width", type=float, required=True, help="Width of original card.")
 
-    parser.add_argument("--height",
-        type=float,
-        required=True,
-        help="Height of original card.")
+    parser.add_argument("--height", type=float, required=True, help="Height of original card.")
 
-    parser.add_argument("--bleed_width",
-        type=float,
-        required=True,
-        help="Width of card including the added bleed.")
+    parser.add_argument("--bleed_width", type=float, required=True, help="Width of card including the added bleed.")
 
-    parser.add_argument("--bleed_height",
-        type=float,
-        required=True,
-        help="Height of card including the added bleed.")
+    parser.add_argument("--bleed_height", type=float, required=True, help="Height of card including the added bleed.")
 
-    parser.add_argument("--crop_strategy",
-        default="smaller",
-        choices={"smaller", "larger"})
+    parser.add_argument("--crop_strategy", default="smaller", choices={"smaller", "larger"})
 
-    parser.add_argument("-q", "--quiet",
-        action="store_true",
-        help="Suppress all output.")
+    parser.add_argument("-q", "--quiet", action="store_true", help="Suppress all output.")
 
-    parser.add_argument("--dpi",
-        default=300,
-        type=int,
-        help="DPI value of resulting images.")
+    parser.add_argument("--dpi", default=300, type=int, help="DPI value of resulting images.")
 
-    parser.add_argument("--strip",
+    parser.add_argument(
+        "--strip",
         action="append",
         default=[],
         choices={"top", "bottom", "left", "right"},
-        help="Remove single strip of pixels from specified side of image before adding the bleed.")
+        help="Remove single strip of pixels from specified side of image before adding the bleed.",
+    )
 
-    parser.add_argument("input_file",
-        type=argparse.FileType("rb"),
-        help="Location of file containing card image(s).")
+    parser.add_argument("input_file", type=argparse.FileType("rb"), help="Location of file containing card image(s).")
 
-    parser.add_argument("output_directory",
+    parser.add_argument(
+        "output_directory",
         type=lambda p: pathlib.Path(p).absolute(),
-        help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.")
+        help="Directory to which images with bleeds should be written. Directory must exist prior to running this program.",
+    )
 
     return parser
 
@@ -365,7 +345,7 @@ def output_filenames(parent_dir=".", suffix="", pad_width=0):
     slug = "{:0{pad_width}d}_card{card_no}_{side}"
 
     for file_no, side in zip(itertools.count(), sides):
-        card_no = int(file_no/2)
+        card_no = int(file_no / 2)
         filename = slug.format(file_no, card_no=card_no, pad_width=pad_width, side=side)
 
         ext = "." + suffix.lstrip(".")
@@ -383,7 +363,9 @@ if __name__ == "__main__":
 
     try:
         img = Image.open(args.input_file)
-        imgs = [img,]
+        imgs = [
+            img,
+        ]
     except UnidentifiedImageError:
         args.input_file.seek(0)
         imgs = convert_from_bytes(args.input_file.read(), dpi=args.dpi)
