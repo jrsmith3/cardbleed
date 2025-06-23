@@ -3,7 +3,6 @@ import argparse
 import itertools
 import logging
 import math
-import os
 import pathlib
 
 from pdf2image import convert_from_bytes
@@ -57,7 +56,7 @@ def mirror_across_edge(im, edge):
             "left": [Image.ROTATE_180, Image.ROTATE_180]
         }
 
-    if edj in transforms.keys():
+    if edj in transforms:
         rot_im = im.transpose(transforms[edj][0])
         mirrored_im = _mirror_right(rot_im)
         result_im = mirrored_im.transpose(transforms[edj][1])
@@ -86,7 +85,7 @@ def frill(im):
     # transposes of the original. I will start by creating the middle
     # set of three images, then mirror across the top and bottom of
     # that image.
-    
+
     base_w, base_h = im.size
 
     res_im = mirror_across_edge(im, edge="left")
@@ -124,15 +123,8 @@ def add_bleed(im, width=None, height=None):
     """
     base_w, base_h = im.size
 
-    if width is None:
-        w = base_w
-    else:
-        w = int(width)
-
-    if height is None:
-        h = base_h
-    else:
-        h = int(height)
+    w = base_w if width is None else int(width)
+    h = base_h if height is None else int(height)
 
     def check_out_of_bounds(val, target, name):
         err_dict = {"val": val, "target": target, "name": name}
@@ -140,8 +132,8 @@ def add_bleed(im, width=None, height=None):
         if val < target:
             err_msg = "{name} ({val}) must be greater than image pixel-{name} ({target})"
             raise ValueError(err_msg.format(**err_dict))
-    
-        elif val > 3 * target:
+
+        if val > 3 * target:
             err_msg = "{name} ({val}) must be less than and 3 times image pixel-{name} ({target})"
             raise ValueError(err_msg.format(**err_dict))
 
@@ -200,15 +192,8 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
     """
     base_w, base_h = im.size
 
-    if bleed_width is None:
-        bleed_w = width
-    else:
-        bleed_w = bleed_width
-
-    if bleed_height is None:
-        bleed_h = height
-    else:
-        bleed_h = bleed_height
+    bleed_w = width if bleed_width is None else bleed_width
+    bleed_h = height if bleed_height is None else bleed_height
 
     def check_out_of_bounds(val, target, val_name, target_name):
         err_dict = {"val": val, "target": target, "val_name": val_name, "target_name": target_name}
@@ -216,8 +201,8 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
         if val < target:
             err_msg = "{val_name} ({val}) must be greater than image {target_name} ({target})"
             raise ValueError(err_msg.format(**err_dict))
-    
-        elif val > 3 * target:
+
+        if val > 3 * target:
             err_msg = "{val_name} ({val}) must be less than 3 times image {target_name} ({target})"
             raise ValueError(err_msg.format(**err_dict))
 
@@ -238,10 +223,7 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
         ppi_larger = ppi_h
         ppi_smaller = ppi_w
 
-    if cs == "smaller":
-        ppi = ppi_smaller
-    else:
-        ppi = ppi_larger
+    ppi = ppi_smaller if cs == "smaller" else ppi_larger
 
     bleed_width_pixels = int(bleed_width * ppi)
     bleed_height_pixels = int(bleed_height * ppi)
@@ -410,7 +392,7 @@ if __name__ == "__main__":
 
     filenames = output_filenames(parent_dir=args.output_directory, suffix=".png", pad_width=pad_width)
 
-    for im, output_file in zip(imgs, filenames):
+    for im, output_file in zip(imgs, filenames, strict=False):
         logger.info(output_file)
         stripped = strip_pixels(im, *args.strip)
         result = add_dimensioned_bleed(stripped, **vars(args))
