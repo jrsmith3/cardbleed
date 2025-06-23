@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cardbleed"
+dynamic = ["version"]
+description = 'Create images with bleed from pdf of card images '
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Joshua Ryan Smith", email = "joshua.r.smith@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "pdf2image",
+  "PIL"
+]
+
+[project.urls]
+Documentation = "https://github.com/Joshua Ryan Smith/cardbleed#readme"
+Issues = "https://github.com/Joshua Ryan Smith/cardbleed/issues"
+Source = "https://github.com/Joshua Ryan Smith/cardbleed"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
