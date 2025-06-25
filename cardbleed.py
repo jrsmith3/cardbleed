@@ -353,7 +353,7 @@ def output_filenames(parent_dir=".", suffix="", pad_width=0):
         yield path
 
 
-if __name__ == "__main__":
+def main():
     parser = create_parser()
     args = parser.parse_args()
 
@@ -379,3 +379,7 @@ if __name__ == "__main__":
         stripped = strip_pixels(im, *args.strip)
         result = add_dimensioned_bleed(stripped, **vars(args))
         result.save(output_file)
+
+
+if __name__ == "__main__":
+    main()
