@@ -49,7 +49,7 @@ def test_mirror_across_edge_size(sample_image, edge):
         assert mirrored.size == (10, 20)
 
 
-# TODO write test for `mirror_across_edge` similar to
+# TODO: write test for `mirror_across_edge` similar to
 # `test_mirror_right_mirrored`.
 
 
@@ -58,7 +58,7 @@ def test_frill_size(sample_image):
     assert frilled.size == (30, 30)
 
 
-# TODO write test for `frill` similar to`test_mirror_right_mirrored`.
+# TODO: write test for `frill` similar to`test_mirror_right_mirrored`.
 
 
 def test_add_bleed_size(sample_image):
