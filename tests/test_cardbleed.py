@@ -33,6 +33,7 @@ def test_mirror_right_size(sample_image):
     assert mirrored.size == (20, 10)
 
 
+# TODO: `sample_image` should include data so the test is nontrivial.
 def test_mirror_right_mirrored(sample_image):
     mirrored = _mirror_right(sample_image)
     left = mirrored.crop((0, 0, 10, 10))
