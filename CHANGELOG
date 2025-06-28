@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 * Refactor to add explicit `main` function (#24)
+* Add type hints (#23)
 * Update `README.md` w/ install, etc. instructions (#21)
 * Make edits suggested by `ruff` linter (#19)
 * Reformat CHANGELOG (#17)

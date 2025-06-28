@@ -14,15 +14,12 @@ LOGGER.setLevel(logging.INFO)
 LOGGER.addHandler(HANDLER)
 
 
-def _mirror_right(im):
+def _mirror_right(im: Image.Image) -> Image.Image:
     """
-    Create image plus its mirror across original image right edge
+    Return image plus its mirror across original image right edge
 
     Args:
-        im (PIL.Image): Image to mirror.
-
-    Returns:
-        PIL.Image
+        im: Image to mirror.
     """
     base_w, base_h = im.size
 
@@ -36,17 +33,14 @@ def _mirror_right(im):
     return result_im
 
 
-def mirror_across_edge(im, edge):
+def mirror_across_edge(im: Image.Image, edge: str) -> Image.Image:
     """
-    Create image plus its mirror attached across specified edge
+    Return image plus its mirror attached across specified edge
 
     Args:
-        im (PIL.Image): Image to mirror.
-        edge (str): Edge across which to mirror. Can be "top",
+        im: Image to mirror.
+        edge: Edge across which to mirror. Can be "top",
             "bottom", "left", or "right" (case insensitive).
-
-    Returns:
-        PIL.Image
     """
     edj = edge.lower()
 
@@ -68,18 +62,15 @@ def mirror_across_edge(im, edge):
     return result_im
 
 
-def frill(im):
+def frill(im: Image.Image) -> Image.Image:
     """
-    Create frill image of card image
+    Return frill image of card image
 
     A "frill" image is created by mirroring and translating a given
     image around the perimiter of the image.
 
     Args:
-        im (PIL.Image): From which to create frill.
-
-    Returns:
-        PIL.Image
+        im: From which to create frill.
     """
     # This function ends up creating an image that is a set of 3x3
     # transposes of the original. I will start by creating the middle
@@ -99,23 +90,21 @@ def frill(im):
     return res_im  # noqa: RET504
 
 
-def add_bleed(im, width=None, height=None):
+def add_bleed(im: Image.Image, width: int | None = None, height: int | None = None) -> Image.Image:
     """
-    Add bleed border around image using a frill
+    Return image with bleed border around image using a frill
 
     Args:
-        im (PIL.Image): Image to which bleed will be added.
-        width (int): Width, in pixels, of the resulting image. Must be
+        im: Image to which bleed will be added.
+        width: Width, in pixels, of the resulting image. Must be
             between one and three times the value of the pixel-width
             of `im`. If `None`, the resulting image will be the same
             width as the `im`.
-        height (int): Height, in pixels, of the resulting image. Must
-            be between one and three times the value of the
-            pixel-height of `im`. If `None`, the resulting image will
-            be the same height as `im`.
 
-    Returns:
-        PIL.Image
+        height: Height, in pixels, of the resulting image. Must be
+            between one and three times the value of the pixel-height
+            of `im`. If `None`, the resulting image will be the same
+            height as `im`.
 
     Raises:
         ValueError: If the width and height values aren't within the
@@ -152,7 +141,15 @@ def add_bleed(im, width=None, height=None):
     return res_im  # noqa: RET504
 
 
-def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None, crop_strategy="smaller", **_):
+def add_dimensioned_bleed(
+    im: Image.Image,
+    width: float,
+    height: float,
+    bleed_width: float | None = None,
+    bleed_height: float | None = None,
+    crop_strategy: str = "smaller",
+    **_: dict,
+) -> Image.Image:
     """
     Add bleed border using frill given image linear spatial dimensions
 
@@ -163,25 +160,23 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
     width and height of the full bleed.
 
     Args:
-        im (PIL.Image): Image to which bleed will be added.
-        width (float): Width of image in a linear spatial unit.
-        height (float): Height of image in a linear spatial unit.
-        bleed_width (float): Width of full bleed in linear spatial
-            unit. Must be between 1 and 3 times the specified `width`.
-            If `None`, resulting image will be the same width as `im`.
-        bleed_height (float): height of full bleed in linear spatial
-            unit. Must be between 1 and 3 times the specified
-            `height`. If `None`, resulting image will be the same
-            height as `im`.
-        crop_strategy (str): Either "smaller" or "larger"
+        im: Image to which bleed will be added.
+        width: Width of image in a linear spatial unit.
+        height: Height of image in a linear spatial unit.
+        bleed_width: Width of full bleed in linear spatial unit. Must
+            be between 1 and 3 times the specified `width`. If `None`,
+            resulting image will be the same width as `im`.
+        bleed_height: height of full bleed in linear spatial unit.
+            Must be between 1 and 3 times the specified `height`. If
+            `None`, resulting image will be the same height as `im`.
+        crop_strategy: Either "smaller" or "larger"
             (case-insensitive). If "smaller", some of the image may be
             cropped out of the resulting image. If "larger", some of
             the frill may be cropped in.
-        **_ (dict): Ignore everything else that's passed to the
-            function.
+        **_: Ignore everything else that's passed to the function.
 
     Returns:
-        PIL.Image
+        Image with bleed border.
 
     Raises:
         ValueError: If the bleed_width and bleed_height values aren't
@@ -230,17 +225,14 @@ def add_dimensioned_bleed(im, width, height, bleed_width=None, bleed_height=None
     return res_im  # noqa: RET504
 
 
-def strip_pixels(im, *args):
+def strip_pixels(im: Image.Image, *args) -> Image.Image:
     """
-    Remove line of pixels from specified edge of image
+    Return image with line of pixels from specified edge removed
 
     Args:
-        im (PIL.Image): Image from which to strip pixels.
-        args (str): Edge from which to remove pixels. Can be "top",
+        im: Image from which to strip pixels.
+        args: Edge from which to remove pixels. Can be "top",
             "bottom", "left", or "right" (case insensitive).
-
-    Returns:
-        PIL.Image
     """
     edjs = {e.lower() for e in args}
     legal_values = {"top", "bottom", "left", "right"}
@@ -273,12 +265,9 @@ def strip_pixels(im, *args):
     return result  # noqa: RET504
 
 
-def create_parser():
+def create_parser() -> argparse.ArgumentParser:
     """
     Factory to create ArgumentParser object defining interface
-
-    Returns:
-        argparse.ArgumentParser
     """
     parser = argparse.ArgumentParser("cardbleed", description="Create card images with bleed from PDF.")
 
@@ -315,7 +304,7 @@ def create_parser():
     return parser
 
 
-def output_filenames(parent_dir=".", suffix="", pad_width=0):
+def output_filenames(parent_dir: str = ".", suffix: str = "", pad_width: int = 0) -> pathlib.Path:
     """
     Infinite generator of output filenames
 
@@ -331,15 +320,15 @@ def output_filenames(parent_dir=".", suffix="", pad_width=0):
     sequence of filenames.
 
     Args:
-        parent_dir (str): Prepended to the filename. Can also be a
+        parent_dir: Prepended to the filename. Can also be a
             pathlib.Path type.
-        suffix (str): File extension appended to the filename. The
-            string can include a preceding dot or not.
-        pad_width (int): Determines the number of zeros padding the
-            left of the file number.
+        suffix: File extension appended to the filename. The string
+            can include a preceding dot or not.
+        pad_width: Determines the number of zeros padding the left of
+            the file number.
 
     Yields:
-        pathlib.Path: Output filename.
+        Output filename.
     """
     sides = itertools.cycle(("front", "back"))
     slug = "{:0{pad_width}d}_card{card_no}_{side}"
