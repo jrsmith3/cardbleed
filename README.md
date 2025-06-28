@@ -3,9 +3,9 @@ Command-line application to create card images with bleed from PDF.
 
 [![Python](https://img.shields.io/badge/language-python-blue.svg)](https://www.python.org/)
 
-**cardbleed** is a command-line tool to create images with bleed from
-a PDF of card images. This is useful for preparing print-ready sheets
-of cards(such as for tabletop games or trading card prototypes),
+`cardbleed` is a command-line tool to create images with bleed from a
+PDF of card images. This is useful for preparing print-ready sheets
+of cards (such as for tabletop games or trading card prototypes),
 where each card image in a PDF needs to be processed to add a "bleed"
 margin for proper printing and cutting.
 
