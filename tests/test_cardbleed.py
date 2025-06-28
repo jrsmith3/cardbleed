@@ -2,7 +2,6 @@
 # Chat, an AI tool by GitHub. Final content was reviewed and adapted
 # by a human.
 
-import argparse
 import sys
 
 import pytest
