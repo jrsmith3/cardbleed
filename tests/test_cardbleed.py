@@ -130,10 +130,7 @@ def test_parser_parses_args(tmp_path):
     assert str(ns.output_directory) == str(output_dir.resolve())
 
 
-@pytest.mark.parametrize("cli_args", [
-    ["--width", "2.5", "--height", "3.5", "--bleed_width", "2.75", "--bleed_height", "3.75"],
-])
-def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
+def test_cli_runs_and_creates_output(tmp_path, monkeypatch):
     # Prepare input image and output directory
     img_file = tmp_path / "test.png"
     Image.new("RGB", (250, 350)).save(img_file)
@@ -141,7 +138,14 @@ def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
     output_dir.mkdir()
 
     # Prepare CLI arguments
-    args = [*cli_args, str(img_file), str(output_dir)]
+    args = [
+        "--width", "2.5",
+        "--height", "3.5",
+        "--bleed_width", "2.75",
+        "--bleed_height", "3.75",
+        str(img_file),
+        str(output_dir),
+    ]
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
 
     # Prevent pytest from exiting
