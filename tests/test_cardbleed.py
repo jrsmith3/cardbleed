@@ -192,7 +192,7 @@ def test_strip_pixels_output(patterned_image, edge, size, expected_pixels):
     assert result.size == size
 
     # Check that the expected pixels are still in the result
-    for result_px, expected_px in zip(result.getdata(), expected_pixels):
+    for result_px, expected_px in zip(result.getdata(), expected_pixels, strict=False):
         assert result_px == expected_px
 
 
