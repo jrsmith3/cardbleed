@@ -31,7 +31,7 @@ Issues = "https://github.com/Joshua Ryan Smith/cardbleed/issues"
 Source = "https://github.com/Joshua Ryan Smith/cardbleed"
 
 [project.scripts]
-cli-name = "cardbleed:main"
+cardbleed = "cardbleed:main"
 
 [build-system]
 requires = [
