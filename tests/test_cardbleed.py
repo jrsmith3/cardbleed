@@ -74,11 +74,12 @@ def test_add_bleed_size(sample_image):
 # * tests the frill is as expected.
 
 
-def test_add_dimensioned_bleed(sample_image):
+def test_add_dimensioned_bleed_size(sample_image):
     result = add_dimensioned_bleed(
         sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0
     )
     assert result.size == (20, 20)
+
 
 def test_strip_pixels(sample_image):
     result = strip_pixels(sample_image, "left", "right")
