@@ -90,7 +90,7 @@ def frill(im: Image.Image) -> Image.Image:
     return res_im  # noqa: RET504
 
 
-def add_bleed(im: Image.Image, width: int = None, height: int = None) -> Image.Image:
+def add_bleed(im: Image.Image, width: int | None = None, height: int | None = None) -> Image.Image:
     """
     Return image with bleed border around image using a frill
 
@@ -141,7 +141,15 @@ def add_bleed(im: Image.Image, width: int = None, height: int = None) -> Image.I
     return res_im  # noqa: RET504
 
 
-def add_dimensioned_bleed(im: Image.Image, width: float, height: float, bleed_width: float = None, bleed_height: float = None, crop_strategy: str = "smaller", **_: dict) -> Image.Image:
+def add_dimensioned_bleed(
+    im: Image.Image,
+    width: float,
+    height: float,
+    bleed_width: float | None = None,
+    bleed_height: float | None = None,
+    crop_strategy: str = "smaller",
+    **_: dict,
+) -> Image.Image:
     """
     Add bleed border using frill given image linear spatial dimensions
 
