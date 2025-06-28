@@ -54,9 +54,10 @@ def test_mirror_across_edge_size(sample_image, edge):
 # `test_mirror_right_mirrored`.
 
 
-def test_frill(sample_image):
+def test_frill_size(sample_image):
     frilled = frill(sample_image)
     assert frilled.size == (30, 30)
+
 
 def test_add_bleed(sample_image):
     result = add_bleed(sample_image, width=20, height=20)
