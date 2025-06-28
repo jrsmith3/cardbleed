@@ -181,21 +181,19 @@ def test_strip_pixels_size(sample_image, edges):
         assert result.size == (10, 9)
 
 
-# TODO: write test to ensure output of `strip_pixels` is as expected.
-@pytest.mark.parametrize("edges, size, expected_pixels", [
-    (["left"], (9, 10), (1, 0)),
-    (["right"], (9, 10), (8, 0)),
-    (["top"], (10, 9), (0, 1)),
-    (["bottom"], (10, 9), (0, 8)),
+@pytest.mark.parametrize("edge, size, expected_pixels", [
+    ("left", (1, 2), ((0, 255, 0), (255, 255, 255))),
+    ("right", (1, 2), ((255, 0, 0), (0, 0, 255))),
+    ("top", (2, 1), ((0, 0, 255), (255, 255, 255))),
+    ("bottom", (2, 1), ((255, 0, 0), (0, 255, 0))),
 ])
-def test_strip_pixels_output(patterned_image, edges, size, expected_pixels):
-    result = strip_pixels(patterned_image, *edges)
+def test_strip_pixels_output(patterned_image, edge, size, expected_pixels):
+    result = strip_pixels(patterned_image, edge)
     assert result.size == size
-    # Check that the expected pixel is still in the result
-    px = result.getpixel(expected_pixels)
-    # For left: should be green (0,255,0), right: red (255,0,0), top: blue (0,0,255), bottom: red (255,0,0)
-    # (depends on what's left after the strip)
-    assert isinstance(px, tuple) and len(px) == 3
+
+    # Check that the expected pixels are still in the result
+    for result_px, expected_px in zip(result.getdata(), expected_pixels):
+        assert result_px == expected_px
 
 
 def test_parser_parses_args(tmp_path):
