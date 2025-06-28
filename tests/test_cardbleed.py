@@ -3,6 +3,7 @@
 # by a human.
 
 import contextlib
+import re
 import sys
 
 import pytest
@@ -32,10 +33,10 @@ def sample_image():
 def patterned_image():
     # 2x2 image, upper left red, upper right green, lower left blue, lower right white
     img = Image.new("RGB", (2, 2))
-    img.putpixel((0, 0), (255, 0, 0))     # red
-    img.putpixel((1, 0), (0, 255, 0))     # green
-    img.putpixel((0, 1), (0, 0, 255))     # blue
-    img.putpixel((1, 1), (255, 255, 255)) # white
+    img.putpixel((0, 0), (255, 0, 0))  # red
+    img.putpixel((1, 0), (0, 255, 0))  # green
+    img.putpixel((0, 1), (0, 0, 255))  # blue
+    img.putpixel((1, 1), (255, 255, 255))  # white
     return img
 
 
@@ -68,7 +69,7 @@ def test_mirror_across_edge_size(sample_image, edge):
 def test_mirror_across_edge_mirrored(patterned_image, edge):
     mirrored = mirror_across_edge(patterned_image, edge)
     # split image in half depending on edge
-    if edge in ('left', 'right'):
+    if edge in ("left", "right"):
         left = mirrored.crop((0, 0, 2, 2))
         right = mirrored.crop((2, 0, 4, 2))
         assert list(left.getdata()) == list(right.transpose(Image.FLIP_LEFT_RIGHT).getdata())
@@ -102,14 +103,23 @@ def test_add_bleed_none(sample_image):
     assert list(result.getdata()) == list(sample_image.getdata())
 
 
-@pytest.mark.parametrize("dimensions",[
-    {"width": 1, "height": 10},    # width too small
-    {"width": 100, "height": 10},  # width too large
-    {"width": 10, "height": 1},    # height too small
-    {"width": 10, "height": 100},  # height too large
-    ])
-def test_add_bleed_value_error(sample_image, dimensions):
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize(
+    ("dimensions", "err_msg"),
+    [
+        ({"width": 1, "height": 10}, "width (1) must be greater than image pixel-width (10)"),  # width too small
+        (
+            {"width": 100, "height": 10},
+            "width (100) must be less than 3 times image pixel-width (10)",
+        ),  # width too large
+        ({"width": 10, "height": 1}, "height (1) must be greater than image pixel-height (10)"),  # height too small
+        (
+            {"width": 10, "height": 100},
+            "height (100) must be less than 3 times image pixel-height (10)",
+        ),  # height too large
+    ],
+)
+def test_add_bleed_value_error(sample_image, dimensions, err_msg):
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
         add_bleed(sample_image, **dimensions)
 
 
@@ -133,14 +143,29 @@ def test_add_dimensioned_bleed_none(sample_image):
     assert list(result.getdata()) == list(sample_image.getdata())
 
 
-@pytest.mark.parametrize("dimensions",[
-    {"bleed_width": 1.0, "bleed_height": 2.0},  # bleed_width too small
-    {"bleed_width": 7.0, "bleed_height": 2.0},  # bleed_width too large
-    {"bleed_width": 2.0, "bleed_height": 1.0},  # bleed_height too small
-    {"bleed_width": 2.0, "bleed_height": 7.0},  # bleed_height too large
-    ])
-def test_add_dimensioned_bleed_value_error(sample_image, dimensions):
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize(
+    ("dimensions", "err_msg"),
+    [
+        (
+            {"bleed_width": 1.0, "bleed_height": 2.0},
+            "bleed_width (1.0) must be greater than image width (2.0)",
+        ),  # bleed_width too small
+        (
+            {"bleed_width": 7.0, "bleed_height": 2.0},
+            "bleed_width (7.0) must be less than 3 times image width (2.0)",
+        ),  # bleed_width too large
+        (
+            {"bleed_width": 2.0, "bleed_height": 1.0},
+            "bleed_height (1.0) must be greater than image height (2.0)",
+        ),  # bleed_height too small
+        (
+            {"bleed_width": 2.0, "bleed_height": 7.0},
+            "bleed_height (7.0) must be less than 3 times image height (2.0)",
+        ),  # bleed_height too large
+    ],
+)
+def test_add_dimensioned_bleed_value_error(sample_image, dimensions, err_msg):
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
         add_dimensioned_bleed(sample_image, width=2.0, height=2.0, **dimensions)
 
 
@@ -153,7 +178,7 @@ def test_add_dimensioned_bleed_crop_strategies(sample_image, crop_strategy):
 
 
 def test_add_dimensioned_bleed_crop_strategy_value_error(sample_image):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="crop_strategy must either be 'larger' or 'smaller'"):
         add_dimensioned_bleed(
             sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0, crop_strategy="invalid"
         )
@@ -176,12 +201,15 @@ def test_strip_pixels_size(sample_image, edges):
         assert result.size == (10, 9)
 
 
-@pytest.mark.parametrize("edge, size, expected_pixels", [
-    ("left", (1, 2), ((0, 255, 0), (255, 255, 255))),
-    ("right", (1, 2), ((255, 0, 0), (0, 0, 255))),
-    ("top", (2, 1), ((0, 0, 255), (255, 255, 255))),
-    ("bottom", (2, 1), ((255, 0, 0), (0, 255, 0))),
-])
+@pytest.mark.parametrize(
+    ("edge", "size", "expected_pixels"),
+    [
+        ("left", (1, 2), ((0, 255, 0), (255, 255, 255))),
+        ("right", (1, 2), ((255, 0, 0), (0, 0, 255))),
+        ("top", (2, 1), ((0, 0, 255), (255, 255, 255))),
+        ("bottom", (2, 1), ((255, 0, 0), (0, 255, 0))),
+    ],
+)
 def test_strip_pixels_output(patterned_image, edge, size, expected_pixels):
     result = strip_pixels(patterned_image, edge)
     assert result.size == size
@@ -267,17 +295,21 @@ def test_cli_output(tmp_path, monkeypatch):
     # Image should be readable
     for png in pngs:
         img = Image.open(png)
-        assert img.size[0] > 0 and img.size[1] > 0
+        assert img.size[0] > 0
+        assert img.size[1] > 0
 
 
 # TODO: this test could be edited to be more precise and test that the
 # output is exactly what is expected.
-@pytest.mark.parametrize("strip_flag, expected_size", [
-    ("left", (249, 350)),
-    ("right", (249, 350)),
-    ("top", (250, 349)),
-    ("bottom", (250, 349)),
-])
+@pytest.mark.parametrize(
+    ("strip_flag", "expected_size"),
+    [
+        ("left", (249, 350)),
+        ("right", (249, 350)),
+        ("top", (250, 349)),
+        ("bottom", (250, 349)),
+    ],
+)
 def test_cli_strip(tmp_path, monkeypatch, strip_flag, expected_size):
     img_file = tmp_path / "test.png"
     Image.new("RGB", (250, 350)).save(img_file)
