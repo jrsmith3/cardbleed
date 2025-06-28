@@ -62,9 +62,10 @@ def test_frill_size(sample_image):
 # TODO write test for `frill` similar to`test_mirror_right_mirrored`.
 
 
-def test_add_bleed(sample_image):
+def test_add_bleed_size(sample_image):
     result = add_bleed(sample_image, width=20, height=20)
     assert result.size == (20, 20)
+
 
 def test_add_dimensioned_bleed(sample_image):
     result = add_dimensioned_bleed(
