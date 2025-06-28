@@ -134,7 +134,6 @@ def test_add_dimensioned_bleed_size(sample_image):
 
 # TODO: write the following tests for `add_dimensioned_bleed`.
 #
-# * Tests when `bleed_width` or `bleed_height` are `None`.
 # * Tests the conditions when `ValueError` is raised according to docstring.
 # * Test both values of `crop_strategy`.
 # * Test condition when `crop_strategy` raises `ValueError`.
@@ -142,7 +141,7 @@ def test_add_dimensioned_bleed_size(sample_image):
 def test_add_dimensioned_bleed_none(sample_image):
     # bleed_width or bleed_height None should default to width/height
     result = add_dimensioned_bleed(sample_image, width=1.0, height=1.0, bleed_width=None, bleed_height=None)
-    assert result.size == (10, 10)
+    assert list(result.getdata()) == list(sample_image.getdata())
 
 
 def test_add_dimensioned_bleed_value_error(sample_image):
