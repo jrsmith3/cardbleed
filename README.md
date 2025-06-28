@@ -65,8 +65,7 @@ Please open an issue to discuss what you would like to change.
 
 
 ## License
-This project does not currently specify a license. Please contact the
-repository owner for permissions or intended use.
+This project is licensed under the [MIT License](./LICENSE).
 
 
 ## Attribution
