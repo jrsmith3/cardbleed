@@ -101,30 +101,21 @@ def test_add_bleed_size(sample_image):
     assert result.size == (20, 20)
 
 
-# TODO: write the following tests for `add_bleed`.
-#
-# * Tests when `width` or `height` args are `None`.
-# * Tests the conditions when `ValueError` is raised.
-# * Tests the frill is as expected.
 def test_add_bleed_none(sample_image):
     # width or height None should default to original size
     result = add_bleed(sample_image, width=None, height=None)
     assert list(result.getdata()) == list(sample_image.getdata())
 
 
-def test_add_bleed_value_error(sample_image):
-    # width too small
+@pytest.mark.parametrize("dimensions",[
+    {"width": 1, "height": 10},    # width too small
+    {"width": 100, "height": 10},  # width too large
+    {"width": 10, "height": 1},    # height too small
+    {"width": 10, "height": 100},  # height too large
+    ])
+def test_add_bleed_value_error(sample_image, dimensions):
     with pytest.raises(ValueError):
-        add_bleed(sample_image, width=1, height=10)
-    # width too large
-    with pytest.raises(ValueError):
-        add_bleed(sample_image, width=100, height=10)
-    # height too small
-    with pytest.raises(ValueError):
-        add_bleed(sample_image, width=10, height=1)
-    # height too large
-    with pytest.raises(ValueError):
-        add_bleed(sample_image, width=10, height=100)
+        add_bleed(sample_image, **dimensions)
 
 
 def test_add_bleed_frill(sample_image):
