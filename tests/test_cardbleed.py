@@ -144,19 +144,15 @@ def test_add_dimensioned_bleed_none(sample_image):
     assert list(result.getdata()) == list(sample_image.getdata())
 
 
-def test_add_dimensioned_bleed_value_error(sample_image):
-    # bleed_width too small
+@pytest.mark.parametrize("dimensions",[
+    {"bleed_width": 1.0, "bleed_height": 2.0},  # bleed_width too small
+    {"bleed_width": 7.0, "bleed_height": 2.0},  # bleed_width too large
+    {"bleed_width": 2.0, "bleed_height": 1.0},  # bleed_height too small
+    {"bleed_width": 2.0, "bleed_height": 7.0},  # bleed_height too large
+    ])
+def test_add_dimensioned_bleed_value_error(sample_image, dimensions):
     with pytest.raises(ValueError):
-        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=1.0, bleed_height=2.0)
-    # bleed_width too large
-    with pytest.raises(ValueError):
-        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=7.0, bleed_height=2.0)
-    # bleed_height too small
-    with pytest.raises(ValueError):
-        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=2.0, bleed_height=1.0)
-    # bleed_height too large
-    with pytest.raises(ValueError):
-        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=2.0, bleed_height=7.0)
+        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, **dimensions)
 
 
 @pytest.mark.parametrize("crop_strategy", ["smaller", "larger"])
