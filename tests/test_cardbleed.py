@@ -2,35 +2,43 @@
 # Chat, an AI tool by GitHub. Final content was reviewed and adapted
 # by a human.
 
-import pytest
-import sys
-from PIL import Image
-from io import BytesIO
 import argparse
-import os
+import sys
+
+import pytest
+from PIL import Image
+
 from cardbleed import (
     _mirror_right,
-    mirror_across_edge,
-    frill,
     add_bleed,
     add_dimensioned_bleed,
-    strip_pixels,
     create_parser,
+    frill,
+    mirror_across_edge,
+    strip_pixels,
+)
+from cardbleed import (
     main as cardbleed_main,
 )
+
 
 @pytest.fixture
 def sample_image():
     # Create a simple 10x10 red image for testing
     return Image.new("RGB", (10, 10), color="red")
 
-def test_mirror_right(sample_image):
+
+def test_mirror_right_size(sample_image):
     mirrored = _mirror_right(sample_image)
     assert mirrored.size == (20, 10)
-    # Check left and right halves are mirrored
+
+
+def test_mirror_right_mirrored(sample_image):
+    mirrored = _mirror_right(sample_image)
     left = mirrored.crop((0, 0, 10, 10))
     right = mirrored.crop((10, 0, 20, 10))
     assert list(left.getdata()) == list(right.transpose(Image.FLIP_LEFT_RIGHT).getdata())
+
 
 @pytest.mark.parametrize("edge", ["left", "right", "top", "bottom"])
 def test_mirror_across_edge(sample_image, edge):
