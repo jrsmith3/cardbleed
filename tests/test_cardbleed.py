@@ -125,6 +125,7 @@ def test_parser_parses_args(tmp_path):
     assert ns.input_file.name == str(img_file)
     assert str(ns.output_directory) == str(output_dir.resolve())
 
+
 @pytest.mark.parametrize("cli_args", [
     ["--width", "2.5", "--height", "3.5", "--bleed_width", "2.75", "--bleed_height", "3.75"],
 ])
@@ -134,22 +135,27 @@ def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
     Image.new("RGB", (10, 10)).save(img_file)
     output_dir = tmp_path / "out"
     output_dir.mkdir()
+
     # Prepare CLI arguments
     args = cli_args + [
         str(img_file),
         str(output_dir),
     ]
     monkeypatch.setattr(sys, "argv", ["cardbleed"] + args)
+
     # Patch sys.exit to prevent pytest from exiting
     monkeypatch.setattr(sys, 'exit', lambda x=0: (_ for _ in ()).throw(SystemExit(x)))
+
     # Run main, expecting files to be written
     try:
         cardbleed_main()
     except SystemExit:
         pass
+
     # Check that at least one PNG was written
     pngs = list(output_dir.glob("*.png"))
     assert len(pngs) >= 1
+
 
 def test_cli_strip_and_quiet(tmp_path, monkeypatch):
     img_file = tmp_path / "test.png"
