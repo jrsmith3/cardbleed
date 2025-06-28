@@ -49,6 +49,11 @@ def test_mirror_across_edge_size(sample_image, edge):
     else:
         assert mirrored.size == (10, 20)
 
+
+# TODO write test for `mirror_across_edge` similar to
+# `test_mirror_right_mirrored`.
+
+
 def test_frill(sample_image):
     frilled = frill(sample_image)
     assert frilled.size == (30, 30)
