@@ -123,11 +123,11 @@ def add_bleed(im: Image.Image, width: int | None = None, height: int | None = No
             raise ValueError(err_msg.format(**err_dict))
 
         if val > 3 * target:
-            err_msg = "{name} ({val}) must be less than and 3 times image pixel-{name} ({target})"
+            err_msg = "{name} ({val}) must be less than 3 times image pixel-{name} ({target})"
             raise ValueError(err_msg.format(**err_dict))
 
-    check_out_of_bounds(width, base_w, "width")
-    check_out_of_bounds(height, base_h, "height")
+    check_out_of_bounds(w, base_w, "width")
+    check_out_of_bounds(h, base_h, "height")
 
     frill_im = frill(im)
 
@@ -217,8 +217,8 @@ def add_dimensioned_bleed(
 
     ppi = ppi_smaller if cs == "smaller" else ppi_larger
 
-    bleed_width_pixels = int(bleed_width * ppi)
-    bleed_height_pixels = int(bleed_height * ppi)
+    bleed_width_pixels = int(bleed_w * ppi)
+    bleed_height_pixels = int(bleed_h * ppi)
 
     res_im = add_bleed(im, width=bleed_width_pixels, height=bleed_height_pixels)
 
@@ -243,23 +243,23 @@ def strip_pixels(im: Image.Image, *args) -> Image.Image:
     base_w, base_h = im.size
 
     left = 0
-    upper = 0
+    top = 0
     right = base_w
-    lower = base_h
+    bottom = base_h
 
     if "left" in edjs:
         left += 1
 
-    if "upper" in edjs:
-        upper += 1
+    if "top" in edjs:
+        top += 1
 
     if "right" in edjs:
         right -= 1
 
     if "bottom" in edjs:
-        lower -= 1
+        bottom -= 1
 
-    box = (left, upper, right, lower)
+    box = (left, top, right, bottom)
     result = im.crop(box)
 
     return result  # noqa: RET504
