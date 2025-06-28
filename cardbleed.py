@@ -217,8 +217,8 @@ def add_dimensioned_bleed(
 
     ppi = ppi_smaller if cs == "smaller" else ppi_larger
 
-    bleed_width_pixels = int(bleed_width * ppi)
-    bleed_height_pixels = int(bleed_height * ppi)
+    bleed_width_pixels = int(bleed_w * ppi)
+    bleed_height_pixels = int(bleed_h * ppi)
 
     res_im = add_bleed(im, width=bleed_width_pixels, height=bleed_height_pixels)
 
