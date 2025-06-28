@@ -64,13 +64,8 @@ def test_mirror_across_edge_size(sample_image, edge):
 
 # TODO: write test for `mirror_across_edge` similar to
 # `test_mirror_right_mirrored`.
-@pytest.mark.parametrize("edge, transpose_op", [
-    ("left", Image.FLIP_LEFT_RIGHT),
-    ("right", Image.FLIP_LEFT_RIGHT),
-    ("top", Image.FLIP_TOP_BOTTOM),
-    ("bottom", Image.FLIP_TOP_BOTTOM),
-])
-def test_mirror_across_edge_mirrored(patterned_image, edge, transpose_op):
+@pytest.mark.parametrize("edge", ["left", "right", "top", "bottom"])
+def test_mirror_across_edge_mirrored(patterned_image, edge):
     mirrored = mirror_across_edge(patterned_image, edge)
     # split image in half depending on edge
     if edge in ('left', 'right'):
