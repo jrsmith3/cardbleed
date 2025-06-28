@@ -164,6 +164,8 @@ def test_cli_strip_and_quiet(tmp_path, monkeypatch):
     Image.new("RGB", (250, 350)).save(img_file)
     output_dir = tmp_path / "out"
     output_dir.mkdir()
+
+    # Prepare CLI arguments
     args = [
         "--width", "2.5",
         "--height", "3.5",
@@ -175,10 +177,12 @@ def test_cli_strip_and_quiet(tmp_path, monkeypatch):
         str(output_dir),
     ]
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
-    monkeypatch.setattr(sys, 'exit', lambda x=0: (_ for _ in ()).throw(SystemExit(x)))
-    try:
+
+    # Prevent pytest from exiting
+    with contextlib.suppress(SystemExit):
+        # Run main, expecting files to be written
         cardbleed_main()
-    except SystemExit:
-        pass
+
+    # Check that at least one PNG was written
     pngs = list(output_dir.glob("*.png"))
     assert len(pngs) >= 1
