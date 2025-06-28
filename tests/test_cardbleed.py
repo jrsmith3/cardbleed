@@ -121,11 +121,11 @@ def test_parser_parses_args(tmp_path):
         str(output_dir),
     ]
     ns = parser.parse_args(args)
-    assert ns.width == 2.5
-    assert ns.height == 3.5
-    assert ns.bleed_width == 2.75
-    assert ns.bleed_height == 3.75
-    assert ns.dpi == 72
+    assert ns.width == 2.5  # noqa: PLR2004
+    assert ns.height == 3.5  # noqa: PLR2004
+    assert ns.bleed_width == 2.75  # noqa: PLR2004
+    assert ns.bleed_height == 3.75  # noqa: PLR2004
+    assert ns.dpi == 72  # noqa: PLR2004
     assert ns.input_file.name == str(img_file)
     assert str(ns.output_directory) == str(output_dir.resolve())
 
