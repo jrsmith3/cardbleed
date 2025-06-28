@@ -81,6 +81,15 @@ def test_add_dimensioned_bleed_size(sample_image):
     assert result.size == (20, 20)
 
 
+# TODO: write the following tests for `add_dimensioned_bleed`.
+#
+# * Tests when `bleed_width` or `bleed_height` are `None`.
+# * Tests the conditions when `ValueError` is raised according to docstring.
+# * Test both values of `crop_strategy`.
+# * Test condition when `crop_strategy` raises `ValueError`.
+# * Tests the bleed is as expected (proper mirroring, etc.).
+
+
 def test_strip_pixels(sample_image):
     result = strip_pixels(sample_image, "left", "right")
     assert result.size == (8, 10)
