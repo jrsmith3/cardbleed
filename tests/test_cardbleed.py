@@ -88,9 +88,7 @@ def test_add_dimensioned_bleed_size(sample_image):
 # * Tests the bleed is as expected (proper mirroring, etc.).
 
 
-@pytest.mark.parametrize(
-    "edges", [["left",], ["right",], ["top",], ["bottom",]]
-    )  # fmt: skip
+@pytest.mark.parametrize("edges", [["left",], ["right",], ["top",], ["bottom",]])
 def test_strip_pixels_size(sample_image, edges):
     result = strip_pixels(sample_image, *edges)
 
