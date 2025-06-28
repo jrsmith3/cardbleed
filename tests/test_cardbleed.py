@@ -45,7 +45,6 @@ def test_mirror_right_size(sample_image):
     assert mirrored.size == (20, 10)
 
 
-# TODO: `sample_image` should include data so the test is nontrivial.
 def test_mirror_right_mirrored(patterned_image):
     mirrored = _mirror_right(patterned_image)
     # Left half should be original, right half should be left half mirrored
@@ -63,8 +62,6 @@ def test_mirror_across_edge_size(sample_image, edge):
         assert mirrored.size == (10, 20)
 
 
-# TODO: write test for `mirror_across_edge` similar to
-# `test_mirror_right_mirrored`.
 @pytest.mark.parametrize("edge", ["left", "right", "top", "bottom"])
 def test_mirror_across_edge_mirrored(patterned_image, edge):
     mirrored = mirror_across_edge(patterned_image, edge)
@@ -84,7 +81,6 @@ def test_frill_size(sample_image):
     assert frilled.size == (30, 30)
 
 
-# TODO: write test for `frill` similar to`test_mirror_right_mirrored`.
 def test_frill_mirrored(patterned_image):
     frilled = frill(patterned_image)
     # Check that the center of the frilled image is the original
