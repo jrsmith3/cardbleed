@@ -191,7 +191,7 @@ def test_add_dimensioned_bleed_frill(sample_image):
     assert list(center.getdata()) == list(sample_image.getdata())
 
 
-@pytest.mark.parametrize("edges", [["left",], ["right",], ["top",], ["bottom",]])
+@pytest.mark.parametrize("edges", [["left",], ["right",], ["top",], ["bottom",]])  # fmt: skip
 def test_strip_pixels_size(sample_image, edges):
     result = strip_pixels(sample_image, *edges)
 
@@ -286,7 +286,7 @@ def test_cli_output(tmp_path, monkeypatch):
         "--bleed_height", "3.75",
         str(img_file),
         str(output_dir),
-    ]
+    ]  # fmt: skip
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
     with contextlib.suppress(SystemExit):
         cardbleed_main()
@@ -323,7 +323,7 @@ def test_cli_strip(tmp_path, monkeypatch, strip_flag, expected_size):
         "--strip", strip_flag,
         str(img_file),
         str(output_dir),
-    ]
+    ]  # fmt: skip
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
 
     with contextlib.suppress(SystemExit):
