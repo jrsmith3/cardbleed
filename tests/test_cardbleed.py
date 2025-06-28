@@ -249,10 +249,11 @@ def test_cli_runs_and_creates_output(tmp_path, monkeypatch):
     assert len(pngs) >= 1
 
 
-# TODO: write test to ensure output of CLI command is as expected.
+# TODO: this test could have more depth and ensure that the output
+# image is exactly what is expected.
 def test_cli_output(tmp_path, monkeypatch):
     img_file = tmp_path / "test.png"
-    Image.new("RGB", (10, 10)).save(img_file)
+    Image.new("RGB", (250, 350)).save(img_file)
     output_dir = tmp_path / "out"
     output_dir.mkdir()
     args = [
