@@ -160,6 +160,8 @@ def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
 # TODO: write test to ensure output of CLI command is as expected.
 
 
+# TODO: refactor the following test to only test the `--strip` flag.
+# The test should be parameterized to test each case.
 def test_cli_strip_and_quiet(tmp_path, monkeypatch):
     img_file = tmp_path / "test.png"
     Image.new("RGB", (10, 10)).save(img_file)
