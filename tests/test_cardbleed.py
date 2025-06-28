@@ -75,9 +75,7 @@ def test_add_bleed_size(sample_image):
 
 
 def test_add_dimensioned_bleed_size(sample_image):
-    result = add_dimensioned_bleed(
-        sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0
-    )
+    result = add_dimensioned_bleed(sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0)
     assert result.size == (20, 20)
 
 
@@ -92,7 +90,7 @@ def test_add_dimensioned_bleed_size(sample_image):
 
 @pytest.mark.parametrize(
     "edges", [["left",], ["right",], ["top",], ["bottom",]]
-    )
+    )  # fmt: skip
 def test_strip_pixels_size(sample_image, edges):
     result = strip_pixels(sample_image, *edges)
 
@@ -119,7 +117,7 @@ def test_parser_parses_args(tmp_path):
         "--dpi", "72",
         str(img_file),
         str(output_dir),
-    ]
+    ]  # fmt: skip
     ns = parser.parse_args(args)
     assert ns.width == 2.5  # noqa: PLR2004
     assert ns.height == 3.5  # noqa: PLR2004
@@ -145,7 +143,7 @@ def test_cli_runs_and_creates_output(tmp_path, monkeypatch):
         "--bleed_height", "3.75",
         str(img_file),
         str(output_dir),
-    ]
+    ]  # fmt: skip
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
 
     # Prevent pytest from exiting
@@ -179,7 +177,7 @@ def test_cli_strip_and_quiet(tmp_path, monkeypatch):
         "--quiet",
         str(img_file),
         str(output_dir),
-    ]
+    ]  # fmt: skip
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
 
     # Prevent pytest from exiting
