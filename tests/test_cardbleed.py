@@ -135,7 +135,7 @@ def test_parser_parses_args(tmp_path):
 def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
     # Prepare input image and output directory
     img_file = tmp_path / "test.png"
-    Image.new("RGB", (10, 10)).save(img_file)
+    Image.new("RGB", (250, 350)).save(img_file)
     output_dir = tmp_path / "out"
     output_dir.mkdir()
 
@@ -164,7 +164,7 @@ def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
 # The test should be parameterized to test each case.
 def test_cli_strip_and_quiet(tmp_path, monkeypatch):
     img_file = tmp_path / "test.png"
-    Image.new("RGB", (10, 10)).save(img_file)
+    Image.new("RGB", (250, 350)).save(img_file)
     output_dir = tmp_path / "out"
     output_dir.mkdir()
     args = [
