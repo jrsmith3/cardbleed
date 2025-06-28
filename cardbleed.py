@@ -243,23 +243,23 @@ def strip_pixels(im: Image.Image, *args) -> Image.Image:
     base_w, base_h = im.size
 
     left = 0
-    upper = 0
+    top = 0
     right = base_w
-    lower = base_h
+    bottom = base_h
 
     if "left" in edjs:
         left += 1
 
-    if "upper" in edjs:
-        upper += 1
+    if "top" in edjs:
+        top += 1
 
     if "right" in edjs:
         right -= 1
 
     if "bottom" in edjs:
-        lower -= 1
+        bottom -= 1
 
-    box = (left, upper, right, lower)
+    box = (left, top, right, bottom)
     result = im.crop(box)
 
     return result  # noqa: RET504
