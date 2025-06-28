@@ -1,5 +1,8 @@
 [build-system]
-requires = ["hatchling"]
+requires = [
+  "hatchling",
+  "hatch-vcs"
+]
 build-backend = "hatchling.build"
 
 [project]
@@ -26,13 +29,16 @@ classifiers = [
 ]
 dependencies = [
   "pdf2image",
-  "PIL"
+  "Pillow"
 ]
 
 [project.urls]
 Documentation = "https://github.com/Joshua Ryan Smith/cardbleed#readme"
 Issues = "https://github.com/Joshua Ryan Smith/cardbleed/issues"
 Source = "https://github.com/Joshua Ryan Smith/cardbleed"
+
+[project.scripts]
+cli-name = "cardbleed:main"
 
 [tool.hatch.version]
 source = "vcs"
