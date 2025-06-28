@@ -67,6 +67,13 @@ def test_add_bleed_size(sample_image):
     assert result.size == (20, 20)
 
 
+# TODO: write the following tests for `add_bleed`.
+#
+# * tests when `width` or `height` args are `None.
+# * tests the conditions when `ValueError` is raised.
+# * tests the frill is as expected.
+
+
 def test_add_dimensioned_bleed(sample_image):
     result = add_dimensioned_bleed(
         sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0
