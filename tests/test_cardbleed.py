@@ -136,11 +136,8 @@ def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
     output_dir.mkdir()
 
     # Prepare CLI arguments
-    args = cli_args + [
-        str(img_file),
-        str(output_dir),
-    ]
-    monkeypatch.setattr(sys, "argv", ["cardbleed"] + args)
+    args = [*cli_args, str(img_file), str(output_dir)]
+    monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
 
     # Patch sys.exit to prevent pytest from exiting
     monkeypatch.setattr(sys, 'exit', lambda x=0: (_ for _ in ()).throw(SystemExit(x)))
@@ -176,7 +173,7 @@ def test_cli_strip_and_quiet(tmp_path, monkeypatch):
         str(img_file),
         str(output_dir),
     ]
-    monkeypatch.setattr(sys, "argv", ["cardbleed"] + args)
+    monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
     monkeypatch.setattr(sys, 'exit', lambda x=0: (_ for _ in ()).throw(SystemExit(x)))
     try:
         cardbleed_main()
