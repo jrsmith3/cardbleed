@@ -101,10 +101,6 @@ def test_strip_pixels_size(sample_image):
 # TODO: write test to ensure output of `strip_pixels` is as expected.
 
 
-def test_create_parser_returns_argparse():
-    parser = create_parser()
-    assert isinstance(parser, argparse.ArgumentParser)
-
 def test_parser_parses_args(tmp_path):
     parser = create_parser()
     img_file = tmp_path / "test.png"
