@@ -109,7 +109,7 @@ def test_add_bleed_size(sample_image):
 def test_add_bleed_none(sample_image):
     # width or height None should default to original size
     result = add_bleed(sample_image, width=None, height=None)
-    assert result.size == sample_image.size
+    assert list(result.getdata()) == list(sample_image.getdata())
 
 
 def test_add_bleed_value_error(sample_image):
