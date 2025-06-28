@@ -123,7 +123,7 @@ def add_bleed(im: Image.Image, width: int | None = None, height: int | None = No
             raise ValueError(err_msg.format(**err_dict))
 
         if val > 3 * target:
-            err_msg = "{name} ({val}) must be less than and 3 times image pixel-{name} ({target})"
+            err_msg = "{name} ({val}) must be less than 3 times image pixel-{name} ({target})"
             raise ValueError(err_msg.format(**err_dict))
 
     check_out_of_bounds(w, base_w, "width")
