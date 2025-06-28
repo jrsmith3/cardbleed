@@ -126,8 +126,8 @@ def add_bleed(im: Image.Image, width: int | None = None, height: int | None = No
             err_msg = "{name} ({val}) must be less than and 3 times image pixel-{name} ({target})"
             raise ValueError(err_msg.format(**err_dict))
 
-    check_out_of_bounds(width, base_w, "width")
-    check_out_of_bounds(height, base_h, "height")
+    check_out_of_bounds(w, base_w, "width")
+    check_out_of_bounds(h, base_h, "height")
 
     frill_im = frill(im)
 
