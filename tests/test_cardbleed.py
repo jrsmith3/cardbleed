@@ -275,17 +275,17 @@ def test_cli_output(tmp_path, monkeypatch):
         assert img.size[0] > 0 and img.size[1] > 0
 
 
-# TODO: refactor the following test to only test the `--strip` flag.
-# The test should be parameterized to test each case.
+# TODO: this test could be edited to be more precise and test that the
+# output is exactly what is expected.
 @pytest.mark.parametrize("strip_flag, expected_size", [
-    ("left", (9, 10)),
-    ("right", (9, 10)),
-    ("top", (10, 9)),
-    ("bottom", (10, 9)),
+    ("left", (249, 350)),
+    ("right", (249, 350)),
+    ("top", (250, 349)),
+    ("bottom", (250, 349)),
 ])
 def test_cli_strip(tmp_path, monkeypatch, strip_flag, expected_size):
     img_file = tmp_path / "test.png"
-    Image.new("RGB", (10, 10)).save(img_file)
+    Image.new("RGB", (250, 350)).save(img_file)
     output_dir = tmp_path / "out"
     output_dir.mkdir()
     args = [
@@ -298,12 +298,16 @@ def test_cli_strip(tmp_path, monkeypatch, strip_flag, expected_size):
         str(output_dir),
     ]
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
+
     with contextlib.suppress(SystemExit):
         cardbleed_main()
+
     pngs = list(output_dir.glob("*.png"))
     assert len(pngs) >= 1
+
     for png in pngs:
         img = Image.open(png)
-        # Bleed will be added, so the size will be larger, but must not be equal to the original (should match the logic)
+        # Bleed will be added, so the size will be larger, but must
+        # not be equal to the original (should match the logic)
         assert img.size[0] >= expected_size[0]
         assert img.size[1] >= expected_size[1]
