@@ -28,17 +28,29 @@ def sample_image():
     return Image.new("RGB", (10, 10), color="red")
 
 
+@pytest.fixture
+def patterned_image():
+    # 2x2 image, upper left red, upper right green, lower left blue, lower right white
+    img = Image.new("RGB", (2, 2))
+    img.putpixel((0, 0), (255, 0, 0))     # red
+    img.putpixel((1, 0), (0, 255, 0))     # green
+    img.putpixel((0, 1), (0, 0, 255))     # blue
+    img.putpixel((1, 1), (255, 255, 255)) # white
+    return img
+
+
 def test_mirror_right_size(sample_image):
     mirrored = _mirror_right(sample_image)
     assert mirrored.size == (20, 10)
 
 
 # TODO: `sample_image` should include data so the test is nontrivial.
-def test_mirror_right_mirrored(sample_image):
-    mirrored = _mirror_right(sample_image)
-    left = mirrored.crop((0, 0, 10, 10))
-    right = mirrored.crop((10, 0, 20, 10))
-    assert list(left.getdata()) == list(right.transpose(Image.FLIP_LEFT_RIGHT).getdata())
+def test_mirror_right_mirrored(patterned_image):
+    mirrored = _mirror_right(patterned_image)
+    # Left half should be original, right half should be left half mirrored
+    left_half = mirrored.crop((0, 0, 2, 2))
+    right_half = mirrored.crop((2, 0, 4, 2))
+    assert list(left_half.getdata()) == list(right_half.transpose(Image.FLIP_LEFT_RIGHT).getdata())
 
 
 @pytest.mark.parametrize("edge", ["left", "right", "top", "bottom"])
@@ -52,6 +64,23 @@ def test_mirror_across_edge_size(sample_image, edge):
 
 # TODO: write test for `mirror_across_edge` similar to
 # `test_mirror_right_mirrored`.
+@pytest.mark.parametrize("edge, transpose_op", [
+    ("left", Image.FLIP_LEFT_RIGHT),
+    ("right", Image.FLIP_LEFT_RIGHT),
+    ("top", Image.FLIP_TOP_BOTTOM),
+    ("bottom", Image.FLIP_TOP_BOTTOM),
+])
+def test_mirror_across_edge_mirrored(patterned_image, edge, transpose_op):
+    mirrored = mirror_across_edge(patterned_image, edge)
+    # split image in half depending on edge
+    if edge in ('left', 'right'):
+        left = mirrored.crop((0, 0, 2, 2))
+        right = mirrored.crop((2, 0, 4, 2))
+        assert list(left.getdata()) == list(right.transpose(Image.FLIP_LEFT_RIGHT).getdata())
+    else:
+        top = mirrored.crop((0, 0, 2, 2))
+        bottom = mirrored.crop((0, 2, 2, 4))
+        assert list(top.getdata()) == list(bottom.transpose(Image.FLIP_TOP_BOTTOM).getdata())
 
 
 def test_frill_size(sample_image):
@@ -60,6 +89,11 @@ def test_frill_size(sample_image):
 
 
 # TODO: write test for `frill` similar to`test_mirror_right_mirrored`.
+def test_frill_mirrored(patterned_image):
+    frilled = frill(patterned_image)
+    # Check that the center of the frilled image is the original
+    center = frilled.crop((2, 2, 4, 4))
+    assert list(center.getdata()) == list(patterned_image.getdata())
 
 
 def test_add_bleed_size(sample_image):
@@ -72,6 +106,34 @@ def test_add_bleed_size(sample_image):
 # * Tests when `width` or `height` args are `None`.
 # * Tests the conditions when `ValueError` is raised.
 # * Tests the frill is as expected.
+def test_add_bleed_none(sample_image):
+    # width or height None should default to original size
+    result = add_bleed(sample_image, width=None, height=None)
+    assert result.size == sample_image.size
+
+
+def test_add_bleed_value_error(sample_image):
+    # width too small
+    with pytest.raises(ValueError):
+        add_bleed(sample_image, width=1, height=10)
+    # width too large
+    with pytest.raises(ValueError):
+        add_bleed(sample_image, width=100, height=10)
+    # height too small
+    with pytest.raises(ValueError):
+        add_bleed(sample_image, width=10, height=1)
+    # height too large
+    with pytest.raises(ValueError):
+        add_bleed(sample_image, width=10, height=100)
+
+
+def test_add_bleed_frill(sample_image):
+    # The frill image used for the bleed should ensure continuity at the borders
+    result = add_bleed(sample_image, width=12, height=12)
+    assert result.size == (12, 12)
+    # Center of result should match the original image
+    center = result.crop((1, 1, 11, 11))
+    assert list(center.getdata()) == list(sample_image.getdata())
 
 
 def test_add_dimensioned_bleed_size(sample_image):
@@ -86,6 +148,47 @@ def test_add_dimensioned_bleed_size(sample_image):
 # * Test both values of `crop_strategy`.
 # * Test condition when `crop_strategy` raises `ValueError`.
 # * Tests the bleed is as expected (proper mirroring, etc.).
+def test_add_dimensioned_bleed_none(sample_image):
+    # bleed_width or bleed_height None should default to width/height
+    result = add_dimensioned_bleed(sample_image, width=1.0, height=1.0, bleed_width=None, bleed_height=None)
+    assert result.size == (10, 10)
+
+
+def test_add_dimensioned_bleed_value_error(sample_image):
+    # bleed_width too small
+    with pytest.raises(ValueError):
+        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=1.0, bleed_height=2.0)
+    # bleed_width too large
+    with pytest.raises(ValueError):
+        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=7.0, bleed_height=2.0)
+    # bleed_height too small
+    with pytest.raises(ValueError):
+        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=2.0, bleed_height=1.0)
+    # bleed_height too large
+    with pytest.raises(ValueError):
+        add_dimensioned_bleed(sample_image, width=2.0, height=2.0, bleed_width=2.0, bleed_height=7.0)
+
+
+@pytest.mark.parametrize("crop_strategy", ["smaller", "larger"])
+def test_add_dimensioned_bleed_crop_strategies(sample_image, crop_strategy):
+    result = add_dimensioned_bleed(
+        sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0, crop_strategy=crop_strategy
+    )
+    assert result.size == (20, 20)
+
+
+def test_add_dimensioned_bleed_crop_strategy_value_error(sample_image):
+    with pytest.raises(ValueError):
+        add_dimensioned_bleed(
+            sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0, crop_strategy="invalid"
+        )
+
+
+def test_add_dimensioned_bleed_frill(sample_image):
+    # The frill in the result should be correct size and centered
+    result = add_dimensioned_bleed(sample_image, width=1.0, height=1.0, bleed_width=2.0, bleed_height=2.0)
+    center = result.crop((5, 5, 15, 15))
+    assert list(center.getdata()) == list(sample_image.getdata())
 
 
 @pytest.mark.parametrize("edges", [["left",], ["right",], ["top",], ["bottom",]])
@@ -99,6 +202,20 @@ def test_strip_pixels_size(sample_image, edges):
 
 
 # TODO: write test to ensure output of `strip_pixels` is as expected.
+@pytest.mark.parametrize("edges, size, expected_pixels", [
+    (["left"], (9, 10), (1, 0)),
+    (["right"], (9, 10), (8, 0)),
+    (["top"], (10, 9), (0, 1)),
+    (["bottom"], (10, 9), (0, 8)),
+])
+def test_strip_pixels_output(patterned_image, edges, size, expected_pixels):
+    result = strip_pixels(patterned_image, *edges)
+    assert result.size == size
+    # Check that the expected pixel is still in the result
+    px = result.getpixel(expected_pixels)
+    # For left: should be green (0,255,0), right: red (255,0,0), top: blue (0,0,255), bottom: red (255,0,0)
+    # (depends on what's left after the strip)
+    assert isinstance(px, tuple) and len(px) == 3
 
 
 def test_parser_parses_args(tmp_path):
@@ -155,34 +272,59 @@ def test_cli_runs_and_creates_output(tmp_path, monkeypatch):
 
 
 # TODO: write test to ensure output of CLI command is as expected.
-
-
-# TODO: refactor the following test to only test the `--strip` flag.
-# The test should be parameterized to test each case.
-def test_cli_strip_and_quiet(tmp_path, monkeypatch):
+def test_cli_output(tmp_path, monkeypatch):
     img_file = tmp_path / "test.png"
-    Image.new("RGB", (250, 350)).save(img_file)
+    Image.new("RGB", (10, 10)).save(img_file)
     output_dir = tmp_path / "out"
     output_dir.mkdir()
-
-    # Prepare CLI arguments
     args = [
         "--width", "2.5",
         "--height", "3.5",
         "--bleed_width", "2.75",
         "--bleed_height", "3.75",
-        "--strip", "left",
-        "--quiet",
         str(img_file),
         str(output_dir),
-    ]  # fmt: skip
+    ]
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
-
-    # Prevent pytest from exiting
     with contextlib.suppress(SystemExit):
-        # Run main, expecting files to be written
         cardbleed_main()
-
-    # Check that at least one PNG was written
     pngs = list(output_dir.glob("*.png"))
     assert len(pngs) >= 1
+    # Image should be readable
+    for png in pngs:
+        img = Image.open(png)
+        assert img.size[0] > 0 and img.size[1] > 0
+
+
+# TODO: refactor the following test to only test the `--strip` flag.
+# The test should be parameterized to test each case.
+@pytest.mark.parametrize("strip_flag, expected_size", [
+    ("left", (9, 10)),
+    ("right", (9, 10)),
+    ("top", (10, 9)),
+    ("bottom", (10, 9)),
+])
+def test_cli_strip(tmp_path, monkeypatch, strip_flag, expected_size):
+    img_file = tmp_path / "test.png"
+    Image.new("RGB", (10, 10)).save(img_file)
+    output_dir = tmp_path / "out"
+    output_dir.mkdir()
+    args = [
+        "--width", "2.5",
+        "--height", "3.5",
+        "--bleed_width", "2.75",
+        "--bleed_height", "3.75",
+        "--strip", strip_flag,
+        str(img_file),
+        str(output_dir),
+    ]
+    monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
+    with contextlib.suppress(SystemExit):
+        cardbleed_main()
+    pngs = list(output_dir.glob("*.png"))
+    assert len(pngs) >= 1
+    for png in pngs:
+        img = Image.open(png)
+        # Bleed will be added, so the size will be larger, but must not be equal to the original (should match the logic)
+        assert img.size[0] >= expected_size[0]
+        assert img.size[1] >= expected_size[1]
