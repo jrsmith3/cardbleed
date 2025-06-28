@@ -2,6 +2,7 @@
 # Chat, an AI tool by GitHub. Final content was reviewed and adapted
 # by a human.
 
+import contextlib
 import sys
 
 import pytest
@@ -143,14 +144,10 @@ def test_cli_runs_and_creates_output(tmp_path, cli_args, monkeypatch):
     args = [*cli_args, str(img_file), str(output_dir)]
     monkeypatch.setattr(sys, "argv", ["cardbleed", *args])
 
-    # Patch sys.exit to prevent pytest from exiting
-    monkeypatch.setattr(sys, 'exit', lambda x=0: (_ for _ in ()).throw(SystemExit(x)))
-
-    # Run main, expecting files to be written
-    try:
+    # Prevent pytest from exiting
+    with contextlib.suppress(SystemExit):
+        # Run main, expecting files to be written
         cardbleed_main()
-    except SystemExit:
-        pass
 
     # Check that at least one PNG was written
     pngs = list(output_dir.glob("*.png"))
