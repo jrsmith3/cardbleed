@@ -90,11 +90,12 @@ def test_add_dimensioned_bleed_size(sample_image):
 # * Tests the bleed is as expected (proper mirroring, etc.).
 
 
-def test_strip_pixels(sample_image):
+def test_strip_pixels_size(sample_image):
     result = strip_pixels(sample_image, "left", "right")
     assert result.size == (8, 10)
     result2 = strip_pixels(sample_image, "top", "bottom")
     assert result2.size == (10, 8)
+
 
 def test_create_parser_returns_argparse():
     parser = create_parser()
