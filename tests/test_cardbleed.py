@@ -42,7 +42,7 @@ def test_mirror_right_mirrored(sample_image):
 
 
 @pytest.mark.parametrize("edge", ["left", "right", "top", "bottom"])
-def test_mirror_across_edge(sample_image, edge):
+def test_mirror_across_edge_size(sample_image, edge):
     mirrored = mirror_across_edge(sample_image, edge)
     if edge in ("left", "right"):
         assert mirrored.size == (20, 10)
